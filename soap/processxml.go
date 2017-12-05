@@ -53,7 +53,7 @@ type ProcessXmlSoap struct {
 
 func NewProcessXmlSoap(url string, tls bool, auth *BasicAuth) *ProcessXmlSoap {
 	if url == "" {
-		url = "https://C3.twinfield.com/webservices/processxml.asmx"
+		url = "https://C4.twinfield.com/webservices/processxml.asmx"
 	}
 	client := NewSOAPClient(url, tls, auth)
 

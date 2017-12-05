@@ -98,7 +98,7 @@ type FinderSoap struct {
 
 func NewFinderSoap(url string, tls bool, auth *BasicAuth) *FinderSoap {
 	if url == "" {
-		url = "https://C3.twinfield.com/webservices/finder.asmx"
+		url = "https://C4.twinfield.com/webservices/finder.asmx"
 	}
 	client := NewSOAPClient(url, tls, auth)
 

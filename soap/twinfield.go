@@ -210,7 +210,7 @@ func (s *SOAPClient) Call(soapAction string, request, response interface{}) erro
 	// <soap:Fault>
 	// <faultcode>soap:Client</faultcode>
 	// <faultstring>Your logon credentials are not valid anymore. Try to log on again.</faultstring>
-	// <faultactor>http://c3.twinfield.com/webservices/processxml.asmx</faultactor>
+	// <faultactor>http://c4.twinfield.com/webservices/processxml.asmx</faultactor>
 	// <detail>
 	// <message>Your logon credentials are not valid anymore. Try to log on again.</message>
 	// <code>103</code>

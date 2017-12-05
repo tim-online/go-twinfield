@@ -306,7 +306,7 @@ type DeclarationsSoap struct {
 
 func NewDeclarationsSoap(url string, tls bool, auth *BasicAuth) *DeclarationsSoap {
 	if url == "" {
-		url = "https://C3.twinfield.com/webservices/declarations.asmx"
+		url = "https://C4.twinfield.com/webservices/declarations.asmx"
 	}
 	client := NewSOAPClient(url, tls, auth)
 
