@@ -1,8 +1,10 @@
 package soap
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -116,6 +118,23 @@ type TransactionLine struct {
 type Match struct {
 }
 
+func (m *Money) UnmarshalJSON(b []byte) error {
+	value := ""
+	err := json.Unmarshal(b, &value)
+	if err != nil {
+		return nil
+	}
+
+	if value == "" {
+		return nil
+	}
+
+	f, err := strconv.ParseFloat(value, 64)
+	m2 := Money(f)
+	*m = m2
+	return err
+}
+
 func (m Money) MarshalText() (text []byte, err error) {
 	f := float64(m)
 	return []byte(fmt.Sprintf("%.2f", f)), nil
@@ -139,6 +158,12 @@ func (d *Date) UnmarshalText(text []byte) (err error) {
 	layout := "20060102"
 	time, err := time.Parse(layout, string(text))
 	date := Date(time)
-	d = &date
+
+	*d = date
 	return err
+}
+
+func (d *Date) MarshalJSON() ([]byte, error) {
+	t := time.Time(*d)
+	return json.Marshal(t.Format("20060102"))
 }
