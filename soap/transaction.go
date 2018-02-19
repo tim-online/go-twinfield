@@ -113,6 +113,9 @@ type TransactionLine struct {
 	FreeChar             string          `xml:"freechar,omitempty"`
 	Comment              string          `xml:"comment,omitempty"`
 	Matches              []Match         `xml:"matches>match,omitempty"`
+
+	MsgType MsgType `xml:"msgtype,attr,omitempty"`
+	Msg     string  `xml:"msg,attr,omitempty"`
 }
 
 type Match struct {
