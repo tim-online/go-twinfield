@@ -15,6 +15,7 @@ var (
 	User         = ""
 	Password     = ""
 	Organisation = ""
+	cluster      = ""
 )
 
 func Login() error {
@@ -42,7 +43,7 @@ func login() (string, error) {
 	if *logonResp.LogonResult != soap.LogonResultOk {
 		return "", fmt.Errorf("logonResult: %s", *logonResp.LogonResult)
 	}
-
+	cluster = logonResp.Cluster
 	sessionID := logonResp.Envelope.Header.Header.(*soap.Header).SessionID
 	return sessionID, nil
 }
@@ -95,8 +96,8 @@ func GetProcessXmlSoap() (*soap.ProcessXmlSoap, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	process := soap.NewProcessXmlSoap("", true, nil)
+	url := cluster + "/webservices/processxml.asmx"
+	process := soap.NewProcessXmlSoap(url, true, nil)
 	header := &soap.Header{
 		SessionID: sessionID,
 	}
@@ -109,8 +110,8 @@ func GetFinderXmlSoap() (*soap.FinderSoap, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	finder := soap.NewFinderSoap("", true, nil)
+	url := cluster + "/webservices/finder.asmx"
+	finder := soap.NewFinderSoap(url, true, nil)
 	header := &soap.Header{
 		SessionID: sessionID,
 	}
@@ -123,8 +124,8 @@ func GetDeclarationsXmlSoap() (*soap.DeclarationsSoap, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	req := soap.NewDeclarationsSoap("", true, nil)
+	url := cluster + "/webservices/declarations.asmx"
+	req := soap.NewDeclarationsSoap(url, true, nil)
 	header := &soap.Header{
 		SessionID: sessionID,
 	}
