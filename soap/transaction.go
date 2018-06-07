@@ -72,6 +72,7 @@ type TransactionHeader struct {
 	Freetext1        string  `xml:"freetext1,omitempty"`
 	Freetext2        string  `xml:"freetext2,omitempty"`
 	Freetext3        string  `xml:"freetext3,omitempty"`
+	InvoiceNumber    string  `xml:"invoicenumber"`
 }
 
 type TransactionLine struct {
@@ -90,7 +91,6 @@ type TransactionLine struct {
 	RepValue             Money           `xml:"repvalue,omitempty"`
 	RepRate              float64         `xml:"reprate,omitempty"`
 	Description          string          `xml:"description"`
-	InvoiceNumber        string          `xml:"invoicenumber"`
 	MatchStatus          MatchStatus     `xml:"matchstatus,omitempty"`
 	MatchLevel           int             `xml:"matchlevel,omitempty"`
 	Relation             int             `xml:"relation,omitempty"`
@@ -133,6 +133,7 @@ func (m *Money) UnmarshalJSON(b []byte) error {
 	}
 
 	f, err := strconv.ParseFloat(value, 64)
+
 	m2 := Money(f)
 	*m = m2
 	return err
@@ -161,8 +162,7 @@ func (d *Date) UnmarshalText(text []byte) (err error) {
 	layout := "20060102"
 	time, err := time.Parse(layout, string(text))
 	date := Date(time)
-
-	*d = date
+	d = &date
 	return err
 }
 
