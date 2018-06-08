@@ -124,18 +124,26 @@ type Match struct {
 func (m *Money) UnmarshalJSON(b []byte) error {
 	value := ""
 	err := json.Unmarshal(b, &value)
-	if err != nil {
-		return nil
+	if err == nil {
+		if value == "" {
+			return nil
+		}
+
+		f, err := strconv.ParseFloat(value, 64)
+
+		m2 := Money(f)
+		*m = m2
+		return err
 	}
 
-	if value == "" {
-		return nil
+	f := 0.0
+	err = json.Unmarshal(b, &f)
+	if err == nil {
+		m2 := Money(f)
+		*m = m2
+		return err
 	}
 
-	f, err := strconv.ParseFloat(value, 64)
-
-	m2 := Money(f)
-	*m = m2
 	return err
 }
 
