@@ -170,7 +170,7 @@ func (d *Date) UnmarshalText(text []byte) (err error) {
 	layout := "20060102"
 	time, err := time.Parse(layout, string(text))
 	date := Date(time)
-	d = &date
+	*d = date
 	return err
 }
 
