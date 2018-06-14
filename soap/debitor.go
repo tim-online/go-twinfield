@@ -9,23 +9,25 @@ type DebDimensionsResponse struct {
 }
 
 type Debitor struct {
-	Office Office `xml:"office" csv:"office"`
-	// Type
-	Code              string `xml:"code" csv:"code"`
-	Uid               string `xml:"uid"`
-	Name              string `xml:"name"`
-	ShortName         string `xml:"shortname"`
-	Inuse             bool
-	Behaviour         string
-	Touched           int
-	Begionperiod      int
-	Beginyear         int
-	Endperiod         int
-	Endyear           int
-	Website           string
-	Cocnumber         obsolete
-	Vatnumber         obsolete
-	Editdimensionname notinuse
+	XMLName xml.Name `xml:"dimension"`
+
+	Office            Office   `xml:"office,omitempty" csv:"office"`
+	Type              string   `xml:"type"`
+	Code              string   `xml:"code" csv:"code"`
+	Uid               string   `xml:"uid,omitempty"`
+	Name              string   `xml:"name"`
+	ShortName         string   `xml:"shortname"`
+	Inuse             bool     `xml:"inuse,omitempty"`
+	Behaviour         string   `xml:"behaviour,omitempty"`
+	Touched           int      `xml:"touched,omitempty"`
+	Beginperiod       int      `xml:"begionperiod,omitempty"`
+	Beginyear         int      `xml:"beginyear,omitempty"`
+	Endperiod         int      `xml:"endperiod,omitempty"`
+	Endyear           int      `xml:"endyear,omitempty"`
+	Website           string   `xml:"website"`
+	Cocnumber         obsolete `xml:"cocnumber,omitempty"`
+	Vatnumber         obsolete `xml:"vatnumber,omitempty"`
+	Editdimensionname notinuse `xml:"editdimensionname,omitempty"`
 	// Financials        Financial
 	// Creditmanagement        Creditmanagement
 	// Remittanceadvice  Remittanceadvice
