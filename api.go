@@ -1,10 +1,15 @@
 package twinfield
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
+	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/tim-online/go-twinfield/soap"
+	"golang.org/x/oauth2"
 )
 
 const sessionTimeout = time.Minute * 30
@@ -16,18 +21,128 @@ var (
 	Password     = ""
 	Organisation = ""
 	cluster      = ""
+
+	ClientID     = ""
+	ClientSecret = ""
+	RefreshToken = ""
+	token        *oauth2.Token
+	company      string // allow this to be set
 )
 
+type Oauth2Config struct {
+	oauth2.Config
+}
+
 func Login() error {
-	// @TODO: implement retry strategy?
-	session, err := login()
-	sessionID = session
+	if IsSessionClient() {
+		return LoginCredentials()
+	}
+
+	if IsOauthClient() {
+		return LoginOauth()
+	}
+
+	return errors.New("neither user and oauth credentials are set")
+}
+
+func IsSessionClient() bool {
+	return User != "" && Password != "" && Organisation != ""
+}
+
+func IsOauthClient() bool {
+	return ClientID != "" && ClientSecret != "" && RefreshToken != ""
+}
+
+func LoginCredentials() error {
+	var err error
+	sessionID, err = loginCredentials()
 	return err
+}
+
+func LoginOauth() error {
+	// @TODO: implement retry strategy?
+	var err error
+	sessionID, err = loginOauth()
+	return err
+}
+
+func loginOauth() (string, error) {
+	var err error
+	if ClientID == "" {
+		return "", errors.New("ClientID is required")
+	}
+
+	if ClientSecret == "" {
+		return "", errors.New("ClientSecret is required")
+	}
+
+	if RefreshToken == "" {
+		return "", errors.New("RefreshToken is required")
+	}
+
+	token, err = RequestAccessTokenWithRefreshToken()
+	if err != nil {
+		return "", err
+	}
+
+	url := fmt.Sprintf("https://login.twinfield.com/auth/authentication/connect/accesstokenvalidation?token=%s", token.AccessToken)
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", err
+	}
+
+	d := json.NewDecoder(resp.Body)
+	val := Validation{}
+	err = d.Decode(&val)
+	if err != nil {
+		return "", err
+	}
+
+	cluster = val.ClusterURL // set global variable
+	return "", nil
+}
+
+func RequestAccessTokenWithRefreshToken() (*oauth2.Token, error) {
+	// build client
+	oauthConfig := NewOauth2Config()
+	oauthConfig.ClientID = ClientID
+	oauthConfig.ClientSecret = ClientSecret
+
+	token := &oauth2.Token{
+		RefreshToken: RefreshToken,
+	}
+
+	// get http client with automatic oauth logic
+	// httpClient := oauthConfig.Client(oauth2.NoContext, refreshToken)
+
+	tokenSource := oauthConfig.TokenSource(oauth2.NoContext, token)
+	return tokenSource.Token()
+}
+
+func NewOauth2Config() *Oauth2Config {
+	authURL, _ := url.Parse("https://login.twinfield.com/auth/authentication/connect/authorize")
+	tokenURL, _ := url.Parse("https://login.twinfield.com/auth/authentication/connect/token")
+
+	// These are not registered in the oauth library by default
+	oauth2.RegisterBrokenAuthHeaderProvider("https://login.twinfield.com")
+
+	return &Oauth2Config{
+		Config: oauth2.Config{
+			RedirectURL:  "",
+			ClientID:     "",
+			ClientSecret: "",
+			Scopes:       []string{},
+			Endpoint: oauth2.Endpoint{
+				AuthURL:  authURL.String(),
+				TokenURL: tokenURL.String(),
+			},
+		},
+	}
 }
 
 // @TODO: add KeepAlive() in separate thread or shutdown session after
 // # of connections = 0
-func login() (string, error) {
+func loginCredentials() (string, error) {
 	session := soap.NewSessionSoap("", true, nil)
 	logon := &soap.Logon{
 		User:         User,
@@ -71,6 +186,20 @@ func GetSessionID() (string, error) {
 	return sessionID, nil
 }
 
+func GetAccessToken() (string, error) {
+	if token.Valid() {
+		return token.AccessToken, nil
+	}
+
+	err := Login()
+	if err != nil {
+		return "", err
+	}
+
+	// start new session with accesstoken
+	return token.AccessToken, nil
+}
+
 func GetOffices() ([]soap.Office, error) {
 	xml := &soap.ProcessXmlString{
 		XmlRequest: "<list><type>offices</type></list>",
@@ -92,43 +221,49 @@ func GetOffices() ([]soap.Office, error) {
 }
 
 func GetProcessXmlSoap() (*soap.ProcessXmlSoap, error) {
-	sessionID, err := GetSessionID()
+	header, err := GetSoapHeader()
 	if err != nil {
 		return nil, err
 	}
+
 	url := cluster + "/webservices/processxml.asmx"
 	process := soap.NewProcessXmlSoap(url, true, nil)
-	header := &soap.Header{
-		SessionID: sessionID,
-	}
 	process.SetHeader(header)
 	return process, nil
 }
 
 func GetFinderXmlSoap() (*soap.FinderSoap, error) {
-	sessionID, err := GetSessionID()
+	header, err := GetSoapHeader()
 	if err != nil {
 		return nil, err
 	}
+
 	url := cluster + "/webservices/finder.asmx"
 	finder := soap.NewFinderSoap(url, true, nil)
-	header := &soap.Header{
-		SessionID: sessionID,
-	}
 	finder.SetHeader(header)
 	return finder, nil
 }
 
 func GetDeclarationsXmlSoap() (*soap.DeclarationsSoap, error) {
-	sessionID, err := GetSessionID()
+	header, err := GetSoapHeader()
 	if err != nil {
 		return nil, err
 	}
+
 	url := cluster + "/webservices/declarations.asmx"
 	req := soap.NewDeclarationsSoap(url, true, nil)
-	header := &soap.Header{
-		SessionID: sessionID,
+	req.SetHeader(header)
+	return req, nil
+}
+
+func GetSessionXmlSoap() (*soap.SessionSoap, error) {
+	header, err := GetSoapHeader()
+	if err != nil {
+		return nil, err
 	}
+
+	url := cluster + "/webservices/session.asmx"
+	req := soap.NewSessionSoap(url, true, nil)
 	req.SetHeader(header)
 	return req, nil
 }
@@ -154,4 +289,37 @@ func GetOfficeByID(officeID string) (*soap.Office, error) {
 	data := []byte(processResp.ProcessXmlStringResult)
 	office, err := soap.OfficeFromXml(data)
 	return office, err
+}
+
+func Cluster() string {
+	return cluster
+}
+
+func GetSoapHeader() (*soap.Header, error) {
+	header := &soap.Header{}
+
+	if IsOauthClient() {
+		token, err := GetAccessToken()
+		if err != nil {
+			return header, err
+		}
+		header.AccessToken = token
+		header.CompanyCode = company
+		return header, nil
+	}
+
+	sessionID, err := GetSessionID()
+	if err != nil {
+		return header, err
+	}
+	header.SessionID = sessionID
+	return header, nil
+}
+
+type Validation struct {
+	ClusterURL string `json:"twf.clusterUrl"`
+}
+
+func SetCompany(company string) {
+	company = company
 }

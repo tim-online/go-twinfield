@@ -93,7 +93,8 @@ type AccessTokenLogon struct {
 }
 
 type AccessTokenLogonResponse struct {
-	XMLName xml.Name `xml:"http://www.twinfield.com/ AccessTokenLogonResponse"`
+	XMLName  xml.Name `xml:"http://www.twinfield.com/ AccessTokenLogonResponse"`
+	Envelope *SOAPEnvelope
 
 	AccessTokenLogonResult *LogonResult `xml:"AccessTokenLogonResult,omitempty"`
 
@@ -156,6 +157,31 @@ func (service *SessionSoap) AccessTokenLogon(request *AccessTokenLogon) (*Access
 		return nil, err
 	}
 
+	response.Envelope = service.client.respEnvelope
+	return response, nil
+}
+
+type SelectCompany struct {
+	XMLName xml.Name `xml:"http://www.twinfield.com/ SelectCompany"`
+
+	Company string `xml:"company"`
+}
+
+type SelectCompanyResponse struct {
+	XMLName  xml.Name `xml:"http://www.twinfield.com/ SelectCompanyResponse"`
+	Envelope *SOAPEnvelope
+
+	SelectCompanyResult string `xml:"SelectCompanyResult"`
+}
+
+func (service *SessionSoap) SelectCompany(request *SelectCompany) (*SelectCompanyResponse, error) {
+	response := new(SelectCompanyResponse)
+	err := service.client.Call("http://www.twinfield.com/SelectCompany", request, response)
+	if err != nil {
+		return nil, err
+	}
+
+	response.Envelope = service.client.respEnvelope
 	return response, nil
 }
 

@@ -17,6 +17,9 @@ type Header struct {
 	XMLName xml.Name `xml:"http://www.twinfield.com/ Header"`
 
 	SessionID string `xml:"SessionID,omitempty"`
+
+	AccessToken string `xml:"AccessToken,omitempty"`
+	CompanyCode string `xml:"CompanyCode,omitempty"`
 }
 
 func dialTimeout(network, addr string) (net.Conn, error) {

@@ -26,6 +26,23 @@ func NewClient(httpClient *http.Client, user string, password string, organisati
 	return c
 }
 
+func NewOauthClient(httpClient *http.Client, clientID, clientSecret, refreshToken string) *Client {
+	if httpClient == nil {
+		httpClient = http.DefaultClient
+	}
+
+	// set package globals :(
+	ClientID = clientID
+	ClientSecret = clientSecret
+	RefreshToken = refreshToken
+
+	// baseURL, _ := url.Parse(defaultBaseURL)
+
+	c := &Client{client: httpClient, UserAgent: userAgent}
+	// c.Products = &ProductsService{client: c}
+	return c
+}
+
 type Client struct {
 	// HTTP client used to communicate with the DO API.
 	client *http.Client
