@@ -320,6 +320,6 @@ type Validation struct {
 	ClusterURL string `json:"twf.clusterUrl"`
 }
 
-func SetCompany(company string) {
-	company = company
+func SetCompany(comp string) {
+	company = comp
 }
