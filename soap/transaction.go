@@ -78,7 +78,7 @@ type TransactionHeader struct {
 type TransactionLine struct {
 	Type                 LineType        `xml:"type,attr"`
 	ID                   int             `xml:"id,attr,omitempty"`
-	Dim1                 string          `xml:"dim1,omitempty"`
+	Dim1                 string          `xml:"dim1"`
 	Dim2                 string          `xml:"dim2,omitempty"`
 	Dim3                 string          `xml:"dim3,omitempty,omitempty"`
 	Dim4                 string          `xml:"dim4,omitempty,omitempty"`
