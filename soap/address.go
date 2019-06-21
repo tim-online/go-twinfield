@@ -1,11 +1,11 @@
 package soap
 
 type Address struct {
-	ID      int    `xml:"id,attr"`
-	Type    string `xml:"type,attr"`
-	Default bool   `xml:"default,attr"`
-	Name    string `xml:"name"`
-	// Country   string `xml:"country,innerxml"`
+	ID        int    `xml:"id,attr"`
+	Type      string `xml:"type,attr"`
+	Default   bool   `xml:"default,attr"`
+	Name      string `xml:"name"`
+	Country   string `xml:"country"`
 	City      string `xml:"city"`
 	Postcode  string `xml:"postcode"`
 	Telephone string `xml:"telephone"`
