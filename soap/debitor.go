@@ -34,6 +34,7 @@ type Debitor struct {
 	Addresses []Address `xml:"addresses>address"`
 	Banks     []Bank    `xml:"banks>bank"`
 	// Postingrules
+	Paymentconditions []Paymentcondition `xml:"paymentconditions>paymentcondition"`
 }
 
 func DebitorFromXml(data []byte) (Debitor, error) {
