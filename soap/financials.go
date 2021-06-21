@@ -21,10 +21,10 @@ type Financials struct {
 	PerformanceType    interface{} `xml:"performancetype,omitempty"`    // Not in use.
 	// Collect mandate information.
 	// Apply this information only when the customer invoices are collected by SEPA direct debit.
-	CollectMandate CollectMandate `xml:"collectmandate,omitempty"`
+	// CollectMandate CollectMandate `xml:"collectmandate,omitempty"`
 	// Collection schema information.
 	// Apply this information only when the customer invoices are collected by SEPA direct debit.
-	CollectionSchema CollectionSchema `xml:"collectionschema,omitempty"`
+	// CollectionSchema CollectionSchema `xml:"collectionschema,omitempty"`
 }
 
 type CollectMandate struct {
