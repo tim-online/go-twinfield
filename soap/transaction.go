@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"strconv"
 	"time"
+
+	"github.com/cydev/zero"
+	"github.com/tim-online/go-twinfield/omitempty"
 )
 
 var (
@@ -55,6 +58,14 @@ type Transaction struct {
 
 	Header TransactionHeader `xml:"header"`
 	Lines  []TransactionLine `xml:"lines>line"`
+}
+
+func (t Transaction) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	return omitempty.MarshalXML(t, e, start)
+}
+
+func (t Transaction) IsEmpty() bool {
+	return zero.IsZero(t)
 }
 
 type TransactionHeader struct {
@@ -112,10 +123,28 @@ type TransactionLine struct {
 	CurrencyDate         *Date           `xml:"currencydate,omitempty"` // date in YYYYmmdd format
 	FreeChar             string          `xml:"freechar,omitempty"`
 	Comment              string          `xml:"comment,omitempty"`
-	Matches              []Match         `xml:"matches>match,omitempty"`
+	Matches              Matches         `xml:"matches>match,omitempty"`
 
 	MsgType MsgType `xml:"msgtype,attr,omitempty"`
 	Msg     string  `xml:"msg,attr,omitempty"`
+}
+
+func (l TransactionLine) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	return omitempty.MarshalXML(l, e, start)
+}
+
+func (l TransactionLine) IsEmpty() bool {
+	return zero.IsZero(l)
+}
+
+type Matches []Match
+
+func (mm Matches) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	return omitempty.MarshalXML(mm, e, start)
+}
+
+func (mm Matches) IsEmpty() bool {
+	return len(mm) == 0
 }
 
 type Match struct {
