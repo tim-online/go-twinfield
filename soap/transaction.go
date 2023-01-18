@@ -61,6 +61,7 @@ type Transaction struct {
 }
 
 func (t Transaction) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name.Local = "transaction"
 	return omitempty.MarshalXML(t, e, start)
 }
 
