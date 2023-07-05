@@ -103,6 +103,7 @@ type TransactionLine struct {
 	RepValue             Money           `xml:"repvalue,omitempty"`
 	RepRate              float64         `xml:"reprate,omitempty"`
 	Description          string          `xml:"description"`
+	InvoiceNumber        string          `xml:"invoicenumber,omitempty"`
 	MatchStatus          MatchStatus     `xml:"matchstatus,omitempty"`
 	MatchLevel           int             `xml:"matchlevel,omitempty"`
 	Relation             int             `xml:"relation,omitempty"`
